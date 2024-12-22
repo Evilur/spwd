@@ -14,9 +14,9 @@
 "USAGE:\n"\
 "\tspwd [arguments]\n\n"\
 "ARGUMENTS:\n"\
-"\t-w, --width <num>\n"\
+"\t-w, --width <width>\n"\
 "\t\tOutput width. Uses the terminal width, if not declared\n"\
-"\t-s, --subtract <num>\n"\
+"\t-s, --subtract <number>\n"\
 "\t\tSubtract the required number of characters from the output width\n"\
 "\t-L, --logical\n"\
 "\t\tUse the PWD environment variable, even if it contains symlinks\n"\
@@ -44,9 +44,9 @@ void handle_args(char const* const* arg_ptr, char const* const* const arg_end) {
 
         /* Handle flag according to its type ('-' or '--')) */
         if ((*arg_ptr)[1] == '-') {  //Flag type: '--'
-            if (strcmp(*arg_ptr + 2, "width") == 0 && arg_ptr + 1 != arg_end) 
+            if (strcmp(*arg_ptr + 2, "width") == 0 && arg_ptr + 1 != arg_end)
                 max_width = atoi(*(arg_ptr + 1));  //Width argument
-            else if (strcmp(*arg_ptr + 2, "subtract") == 0 && arg_ptr + 1 != arg_end) 
+            else if (strcmp(*arg_ptr + 2, "subtract") == 0 && arg_ptr + 1 != arg_end)
                 max_width -= atoi(*(arg_ptr + 1));  //Subtract argument
             else if (strcmp(*arg_ptr + 2, "logical") == 0) physical_pwd = false;  //Logical argument
             else if (strcmp(*arg_ptr + 2, "physical") == 0) physical_pwd = true;  //Physical argument
@@ -56,7 +56,7 @@ void handle_args(char const* const* arg_ptr, char const* const* const arg_end) {
             }
             continue;
         }
-        
+
         /* Flag type: '-' */
         switch ((*arg_ptr)[1]) {
             case 'w':  //Width argument
