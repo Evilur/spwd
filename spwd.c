@@ -1,9 +1,9 @@
-#include <sys/ioctl.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <string.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/ioctl.h>
 
 #define HELP_DATA \
 "NAME:\n"\
