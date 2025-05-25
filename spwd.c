@@ -31,9 +31,19 @@ int max_width = 0;
 
 /* Get the terminal width and use it as a default width */
 void set_max_width() {
-    struct winsize w;
-    ioctl(0, TIOCGWINSZ, &w);
-    max_width = w.ws_col;
+    /* Check all file descriptors */
+    for (int fd = STDIN_FILENO; fd <= STDERR_FILENO; fd++) {
+        /* If this descryptor is not a tty, get the next one */
+        if (!isatty(fd)) continue;
+
+        /* Get the terminal width */
+        struct winsize w;
+        ioctl(fd, TIOCGWINSZ, &w);
+
+        /* Set the value and exit */
+        max_width = w.ws_col;
+        return;
+    }
 }
 
 void handle_args(char const* const* arg_ptr, char const* const* const arg_end) {
