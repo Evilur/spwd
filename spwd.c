@@ -5,26 +5,6 @@
 #include <unistd.h>
 #include <sys/ioctl.h>
 
-#define HELP_DATA \
-"NAME:\n"\
-"\tspwd - Short Print Working Directory\n\n"\
-"DESCRIPTION:\n"\
-"\tPrint the name of the current working directory, \n"\
-"\tshortening where possible to match the required output width\n\n"\
-"USAGE:\n"\
-"\tspwd [arguments]\n\n"\
-"ARGUMENTS:\n"\
-"\t-w, --width <width>\n"\
-"\t\tOutput width. Uses the terminal width, if not declared\n"\
-"\t-s, --subtract <number>\n"\
-"\t\tSubtract the required number of characters from the output width\n"\
-"\t-L, --logical\n"\
-"\t\tUse the PWD environment variable, even if it contains symlinks\n"\
-"\t-P, --physical\n"\
-"\t\tPrint the directory name without symlinks\n"\
-"\t-h, --help\n"\
-"\t\tDisplay this help and exit"
-
 /**
  * The path to be printed
  */
@@ -56,6 +36,11 @@ const char* get_physical_dir(void);
  * @param arg_end The pointer to the last argmuent string
  */
 void handle_args(char const* const* arg_ptr, char const* const* const arg_end);
+
+/*
+ * Print help and exit the program
+ */
+void print_help(void);
 
 /*
  * Print the current working directory
@@ -118,8 +103,7 @@ void handle_args(char const* const* arg_ptr, char const* const* const arg_end) {
             else if (strcmp(*arg_ptr + 2, "logical") == 0) path = get_logical_dir();  // Logical argument
             else if (strcmp(*arg_ptr + 2, "physical") == 0) path = get_physical_dir();  // Physical argument
             else if (strcmp(*arg_ptr + 2, "help") == 0) {  //Help argument
-                printf(HELP_DATA);
-                exit(0);
+                print_help();
             }
             continue;
         }
@@ -143,10 +127,27 @@ void handle_args(char const* const* arg_ptr, char const* const* const arg_end) {
                 path = get_physical_dir();
                 continue;
             case 'h':  // Help argument
-                printf(HELP_DATA);
-                exit(0);
+                print_help();
         }
     }
+}
+
+void print_help() {
+    /* Get the system language */
+    char const* const lang = getenv("LANG");
+
+    /* Print the help according to the language */
+    if (strncmp(lang, "ru", 2) == 0)  // Russian
+        printf(
+#include "help/ru-RU"
+             );
+    else  // Default is English
+        printf(
+#include "help/en-US"
+             );
+
+    /* Exit the program with seccess code */
+    exit(0);
 }
 
 void print_working_dir() {

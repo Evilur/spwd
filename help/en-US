@@ -1,0 +1,18 @@
+"NAME:\n"\
+"\tspwd - Short Print Working Directory\n\n"\
+"DESCRIPTION:\n"\
+"\tPrint the name of the current working directory, \n"\
+"\tshortening where possible to match the required output width\n\n"\
+"USAGE:\n"\
+"\tspwd [arguments]\n\n"\
+"ARGUMENTS:\n"\
+"\t-w, --width <width>\n"\
+"\t\tOutput width. Uses the terminal width, if not declared\n"\
+"\t-s, --subtract <number>\n"\
+"\t\tSubtract the required number of characters from the output width\n"\
+"\t-L, --logical\n"\
+"\t\tPrint the PWD environment variable, even if it contains symlinks\n"\
+"\t-P, --physical\n"\
+"\t\tPrint the directory name without symlinks\n"\
+"\t-h, --help\n"\
+"\t\tDisplay this help and exit"
