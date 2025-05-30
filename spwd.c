@@ -88,7 +88,8 @@ const char* get_logical_dir() {
     return getenv("PWD");
 }
 
-void handle_args(char const* const* arg_ptr, char const* const* const arg_end) {
+void handle_args(char const* const* arg_ptr,
+                 char const* const* const arg_end) {
     /* Check all arguments */
     while (++arg_ptr < arg_end) {
         /* Get flags only */
@@ -98,10 +99,13 @@ void handle_args(char const* const* arg_ptr, char const* const* const arg_end) {
         if ((*arg_ptr)[1] == '-') {  // Flag type: '--'
             if (strcmp(*arg_ptr + 2, "width") == 0 && arg_ptr + 1 != arg_end)
                 max_width = atoi(*(arg_ptr + 1));  // Width argument
-            else if (strcmp(*arg_ptr + 2, "subtract") == 0 && arg_ptr + 1 != arg_end)
+            else if (strcmp(*arg_ptr + 2, "subtract") == 0
+                     && arg_ptr + 1 != arg_end)
                 max_width -= atoi(*(arg_ptr + 1));  // Subtract argument
-            else if (strcmp(*arg_ptr + 2, "logical") == 0) path = get_logical_dir();  // Logical argument
-            else if (strcmp(*arg_ptr + 2, "physical") == 0) path = get_physical_dir();  // Physical argument
+            else if (strcmp(*arg_ptr + 2, "logical") == 0)
+                path = get_logical_dir();  // Logical argument
+            else if (strcmp(*arg_ptr + 2, "physical") == 0)
+                path = get_physical_dir();  // Physical argument
             else if (strcmp(*arg_ptr + 2, "help") == 0) {  //Help argument
                 print_help();
             }
@@ -165,10 +169,12 @@ void print_working_dir() {
     /* Get the current directory size */
     int path_sz = (int)(strlen(path));
 
-    /* Get the difference between the maximum output width and the directory size */
+    /* Get the difference between the maximum
+     * output width and the directory size */
     int size_delta = path_sz - max_width;
 
-    /* If the size of the current directory is less than the maximum, just print it */
+    /* If the size of the current directory is
+     * less than the maximum, just print it */
     if (size_delta <= 0) {
         printf("%s", path);
         return;
@@ -191,13 +197,16 @@ void print_working_dir() {
     /* Cycle through all possible ways to shorten the path */
     do {
         /* Get pointer to the first possible shortening end */
-        char const* const path_replaceable_end = strchr(path_replaceable_ptr + size_delta, '/');
+        char const* const path_replaceable_end =
+            strchr(path_replaceable_ptr + size_delta, '/');
 
         /* If the pointer is too big, there isn't any shortenings anymore */
-        if (path_replaceable_end == NULL || path_replaceable_end > path_end) break;
+        if (path_replaceable_end == NULL
+            || path_replaceable_end > path_end) break;
 
         /* Eval the current replacable part size */
-        const int cur_size = (int)(path_replaceable_end - path_replaceable_ptr);
+        const int cur_size =
+            (int)(path_replaceable_end - path_replaceable_ptr);
 
         /* If it is the worse way, continue finding */
         if (cur_size >= replace_size) continue;
@@ -205,7 +214,8 @@ void print_working_dir() {
         /* If it is the better way, replace the old one */
         replace_part = path_replaceable_ptr;
         replace_size = cur_size;
-    } while ((path_replaceable_ptr = strchr(path_replaceable_ptr + 1, '/')) < path_end);
+    } while ((path_replaceable_ptr = strchr(path_replaceable_ptr + 1, '/'))
+             < path_end);
 
     /* Print the result */
     if (replace_part == NULL) {
