@@ -25,12 +25,56 @@
 "\t-h, --help\n"\
 "\t\tDisplay this help and exit"
 
+/**
+ * The path to be printed
+ */
 const char* path = NULL;
-bool physical_pwd = false;
+
+/**
+ * The max lenght of the output
+ */
 int max_width = 0;
 
-/* Get the terminal width and use it as a default width */
-void set_max_width() {
+/**
+ * @return The terminal width, which can be used to print the directory
+ */
+int get_terminal_width(void);
+
+/**
+ * @return The current working directory (with symlinks)
+ */
+const char* get_logical_dir(void);
+
+/**
+ * @return The physical path to the current working directory (ignore symlinks)
+ */
+const char* get_physical_dir(void);
+
+/**
+ * Handle passed arguments
+ * @param arg_ptr The pointer to the first argmuent string
+ * @param arg_end The pointer to the last argmuent string
+ */
+void handle_args(char const* const* arg_ptr, char const* const* const arg_end);
+
+/*
+ * Print the current working directory
+ */
+void print_working_dir(void);
+
+int main(const int arg_c, char const* const* arg_ptr) {
+    /* Get the terminal width and set it as max width value */
+    max_width = get_terminal_width();
+
+    /* Handle arguments (if exist) */
+    if (arg_c > 1) handle_args(arg_ptr, arg_ptr + arg_c);
+
+    /* Format and print the current working directory */
+    print_working_dir();
+    return 0;
+}
+
+int get_terminal_width() {
     /* Check all file descriptors */
     for (int fd = STDIN_FILENO; fd <= STDERR_FILENO; fd++) {
         /* If this descryptor is not a tty, get the next one */
@@ -40,10 +84,23 @@ void set_max_width() {
         struct winsize w;
         ioctl(fd, TIOCGWINSZ, &w);
 
-        /* Set the value and exit */
-        max_width = w.ws_col;
-        return;
+        /* If the path var is not definied yet, put the logical dir there */
+        if (path == NULL) path = get_logical_dir();
+
+        /* Return the value */
+        return w.ws_col;
     }
+
+    /* If it's impossible to get the width */
+    return 0;
+}
+
+const char* get_physical_dir() {
+    return getcwd(0, 0);
+}
+
+const char* get_logical_dir() {
+    return getenv("PWD");
 }
 
 void handle_args(char const* const* arg_ptr, char const* const* const arg_end) {
@@ -53,13 +110,13 @@ void handle_args(char const* const* arg_ptr, char const* const* const arg_end) {
         if ((*arg_ptr)[0] != '-') continue;
 
         /* Handle flag according to its type ('-' or '--')) */
-        if ((*arg_ptr)[1] == '-') {  //Flag type: '--'
+        if ((*arg_ptr)[1] == '-') {  // Flag type: '--'
             if (strcmp(*arg_ptr + 2, "width") == 0 && arg_ptr + 1 != arg_end)
-                max_width = atoi(*(arg_ptr + 1));  //Width argument
+                max_width = atoi(*(arg_ptr + 1));  // Width argument
             else if (strcmp(*arg_ptr + 2, "subtract") == 0 && arg_ptr + 1 != arg_end)
-                max_width -= atoi(*(arg_ptr + 1));  //Subtract argument
-            else if (strcmp(*arg_ptr + 2, "logical") == 0) physical_pwd = false;  //Logical argument
-            else if (strcmp(*arg_ptr + 2, "physical") == 0) physical_pwd = true;  //Physical argument
+                max_width -= atoi(*(arg_ptr + 1));  // Subtract argument
+            else if (strcmp(*arg_ptr + 2, "logical") == 0) path = get_logical_dir();  // Logical argument
+            else if (strcmp(*arg_ptr + 2, "physical") == 0) path = get_physical_dir();  // Physical argument
             else if (strcmp(*arg_ptr + 2, "help") == 0) {  //Help argument
                 printf(HELP_DATA);
                 exit(0);
@@ -69,32 +126,28 @@ void handle_args(char const* const* arg_ptr, char const* const* const arg_end) {
 
         /* Flag type: '-' */
         switch ((*arg_ptr)[1]) {
-            case 'w':  //Width argument
+            case 'w':  // Width argument
                 /* Get the output width if exists */
                 if (arg_ptr + 1 != arg_end)
                     max_width = atoi(*(arg_ptr + 1));
                 continue;
-            case 's':  //Subtract argument
+            case 's':  // Subtract argument
                 /* Subtract the number of chars if exists */
                 if (arg_ptr + 1 != arg_end)
                     max_width -= atoi(*(arg_ptr + 1));
                 continue;
-            case 'L':  //Logical argument
-                physical_pwd = false;
+            case 'L':  // Logical argument
+                path = get_logical_dir();
                 continue;
-            case 'P':  //Physical argument
-                physical_pwd = true;
+            case 'P':  // Physical argument
+                path = get_physical_dir();
                 continue;
-            case 'h':  //Help argument
+            case 'h':  // Help argument
                 printf(HELP_DATA);
                 exit(0);
         }
     }
 }
-
-void set_physical_dir() { path = getcwd(0, 0); }
-
-void set_logical_dir() { path = getenv("PWD"); }
 
 void print_working_dir() {
     /* Get the nesting level */
@@ -132,7 +185,7 @@ void print_working_dir() {
 
     /* Decalare vars for the replace pointer and the replace size */
     char* replace_part = NULL;
-    int replace_size = 2147483647;
+    int replace_size = 2147483647; // Int max
 
     /* Cycle through all possible ways to shorten the path */
     do {
@@ -162,20 +215,4 @@ void print_working_dir() {
         replace_part[0] = '\0';
         printf("%s/...%s", path, replace_part + replace_size);
     }
-}
-
-int main(const int arg_c, char const* const* arg_ptr) {
-    /* Set the output width */
-    set_max_width();
-
-    /* Handle arguments (if exist) */
-    if (arg_c > 1) handle_args(arg_ptr, arg_ptr + arg_c);
-
-    /* Set the current working directory */
-    if (physical_pwd) set_physical_dir();
-    else set_logical_dir();
-
-    /* Format and print the current working directory */
-    print_working_dir();
-    return 0;
 }
