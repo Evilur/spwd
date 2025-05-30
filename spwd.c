@@ -158,19 +158,19 @@ void print_working_dir() {
 
     /* If we have very few directories, print the original data and exit */
     if (nest_level <= 3) {
-        printf(path);
+        printf("%s", path);
         return;
     }
 
     /* Get the current directory size */
-    int path_sz = strlen(path);
+    int path_sz = (int)(strlen(path));
 
     /* Get the difference between the maximum output width and the directory size */
     int size_delta = path_sz - max_width;
 
     /* If the size of the current directory is less than the maximum, just print it */
     if (size_delta <= 0) {
-        printf(path);
+        printf("%s", path);
         return;
     }
 
@@ -197,7 +197,7 @@ void print_working_dir() {
         if (path_replaceable_end == NULL || path_replaceable_end > path_end) break;
 
         /* Eval the current replacable part size */
-        const int cur_size = path_replaceable_end - path_replaceable_ptr;
+        const int cur_size = (int)(path_replaceable_end - path_replaceable_ptr);
 
         /* If it is the worse way, continue finding */
         if (cur_size >= replace_size) continue;
